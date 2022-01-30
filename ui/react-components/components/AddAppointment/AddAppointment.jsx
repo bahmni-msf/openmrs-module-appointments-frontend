@@ -62,6 +62,7 @@ import {isEmpty, isNil} from 'lodash';
 import AppointmentEditorCommonFieldsWrapper
     from "../AppointmentEditorCommonFieldsWrapper/AppointmentEditorCommonFieldsWrapper.jsx";
 import Conflicts from "../Conflicts/Conflicts.jsx";
+import {isLocationMandatory, isServiceTypeMandatory} from "../../helper";
 import updateAppointmentStatusAndProviderResponse from "../../appointment-request/AppointmentRequest";
 import * as patientApi from "../../api/patientApi";
 import {mapOpenMRSPatient} from "../../mapper/patientMapper";
@@ -211,21 +212,31 @@ const AddAppointment = props => {
     const isValidAppointment = () => {
         const isValidPatient = appointmentDetails.patient && appointmentDetails.patient.value.uuid;
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);
+        const isLocationMandatoryAndEmpty = isLocationMandatory(appConfig) ? _.isEmpty(appointmentDetails.location) : false;
+        const isServiceTypeMandatoryAndEmpty = isServiceTypeMandatory(appConfig) ? _.isEmpty(appointmentDetails.serviceType) : false;
         updateCommonErrorIndicators(isValidPatient, startTimeBeforeEndTime);
-        updateErrorIndicators({appointmentDateError: !appointmentDetails.appointmentDate});
-        return isValidPatient && appointmentDetails.service && appointmentDetails.appointmentDate && appointmentDetails.startTime && appointmentDetails.endTime && startTimeBeforeEndTime;
+        updateErrorIndicators({
+            appointmentDateError: !appointmentDetails.appointmentDate,
+            locationError: isLocationMandatoryAndEmpty,
+            serviceTypeError: isServiceTypeMandatoryAndEmpty
+        });
+        return isValidPatient && appointmentDetails.service && appointmentDetails.appointmentDate && appointmentDetails.startTime && appointmentDetails.endTime && startTimeBeforeEndTime && !isLocationMandatoryAndEmpty && !isServiceTypeMandatoryAndEmpty ;
     };
 
     const isValidRecurringAppointment = () => {
         const isValidPatient = appointmentDetails.patient && appointmentDetails.patient.value.uuid;
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);
+        const isLocationMandatoryAndEmpty = isLocationMandatory(appConfig) ? _.isEmpty(appointmentDetails.location): false;
+        const isServiceTypeMandatoryAndEmpty = isServiceTypeMandatory(appConfig) ? _.isEmpty(appointmentDetails.serviceType) : false;
         const selectedWeekDays = getSelectedWeekDays(appointmentDetails.weekDays);
         updateCommonErrorIndicators(isValidPatient, startTimeBeforeEndTime);
         updateErrorIndicators({
             recurrencePeriodError: !appointmentDetails.period || appointmentDetails.period < 1,
             endDateTypeError: !appointmentDetails.endDateType,
             weekDaysError: appointmentDetails.recurrenceType === 'WEEK' && isEmpty(selectedWeekDays),
-            startDateError: !appointmentDetails.startDateType || !appointmentDetails.recurringStartDate
+            startDateError: !appointmentDetails.startDateType || !appointmentDetails.recurringStartDate,
+            locationError: isLocationMandatoryAndEmpty,
+            serviceTypeError: isServiceTypeMandatoryAndEmpty
         });
         if (appointmentDetails.endDateType) {
             updateErrorIndicators({
@@ -236,7 +247,8 @@ const AddAppointment = props => {
         return isValidPatient && appointmentDetails.service && appointmentDetails.startTime
             && appointmentDetails.endTime && startTimeBeforeEndTime && appointmentDetails.recurrenceType
             && appointmentDetails.period && appointmentDetails.period > 0 && appointmentDetails.recurringStartDate
-            && isValidEndDate() && (appointmentDetails.recurrenceType === dayRecurrenceType || !isEmpty(selectedWeekDays));
+            && isValidEndDate() && (appointmentDetails.recurrenceType === dayRecurrenceType || !isEmpty(selectedWeekDays))
+            && !isLocationMandatoryAndEmpty && !isServiceTypeMandatoryAndEmpty;
     };
 
     const updateCommonErrorIndicators = (isValidPatient, startTimeBeforeEndTime) => updateErrorIndicators({
@@ -265,7 +277,6 @@ const AddAppointment = props => {
             setServiceErrorMessage('');
         }, SERVICE_ERROR_MESSAGE_TIME_OUT_INTERVAL);
     };
-
 
     const save = async appointmentRequest => {
         setDisableSaveButton(true);
@@ -434,7 +445,7 @@ const AddAppointment = props => {
         var allowVirtualConsultation = appConfig && appConfig.allowVirtualConsultation;
         if (allowVirtualConsultation) {
             return <AppointmentType appointmentType={appointmentDetails.appointmentType}
-                    isTeleconsultation={appointmentDetails.teleconsultation}     
+                    isTeleconsultation={appointmentDetails.teleconsultation}
                     onChange={(e) => {
                         if (e.target.name === TELECONSULTATION_APPOINTMENT) {
                             updateAppointmentDetails({ teleconsultation: e.target.checked });
@@ -455,7 +466,7 @@ const AddAppointment = props => {
 
     const on = "On";
     return (<Fragment>
-        <div data-testid="appointment-editor" className={classNames(appointmentEditor, appointmentDetails.appointmentType === RECURRING_APPOINTMENT_TYPE ? isRecurring : '')}>
+        <div data-testid="appointment-editor" className={classNames(appointmentEditor, appointmentDetails.appointmentType === RECURRING_APPOINTMENT_TYPE ? isRecurring: '')}>
             <AppointmentEditorCommonFieldsWrapper appointmentDetails={appointmentDetails}
                 updateAppointmentDetails={updateAppointmentDetails}
                 updateErrorIndicators={updateErrorIndicators}
@@ -466,7 +477,7 @@ const AddAppointment = props => {
                     <AppointmentPlan appointmentType={appointmentDetails.appointmentType}
                         onChange={(e) => {
                             if (appointmentDetails.appointmentType === e.target.name) {
-                                updateAppointmentDetails({ appointmentType: undefined });    
+                                updateAppointmentDetails({ appointmentType: undefined });
                             } else {
                                 updateAppointmentDetails({ appointmentType: e.target.name });
                             }

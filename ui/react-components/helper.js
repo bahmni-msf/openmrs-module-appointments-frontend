@@ -1,4 +1,10 @@
-import {DEFAULT_MAX_APPOINTMENT_PROVIDERS, minDurationForAppointment, PROVIDER_RESPONSES} from "./constants";
+import {
+    DEFAULT_MAX_APPOINTMENT_PROVIDERS,
+    LOCATION,
+    minDurationForAppointment,
+    PROVIDER_RESPONSES,
+    SERVICE_TYPE
+} from "./constants";
 import moment from "moment";
 
 export const isSpecialitiesEnabled = appConfig => {
@@ -46,7 +52,7 @@ export const searchFieldOnChangeHandler=(state, setState, selectedState, setSele
       setState(() =>
         [...state].filter(item => item !== eventChangedValue)
       );
-}
+};
 
 export const searchFieldOnRemoveHandler=(state, setState, selectedState, setSelectedState, eventChangedValue)=>{
     setSelectedState(() =>
@@ -56,4 +62,12 @@ export const searchFieldOnRemoveHandler=(state, setState, selectedState, setSele
       ...state,
       { value: eventChangedValue, label: eventChangedValue }
     ]);
-}
+};
+
+export const isLocationMandatory = appConfig => {
+    return appConfig && !_.isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === LOCATION));
+};
+
+export const isServiceTypeMandatory = appConfig => {
+    return appConfig && !_.isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === SERVICE_TYPE));
+};
