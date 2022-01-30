@@ -1,5 +1,14 @@
-export const appName = 'appointments';
+const hostUrl = localStorage.getItem('host') ? ("https://" + localStorage.getItem('host')) : "";
+const restWestV1 = `${hostUrl}/openmrs/ws/rest/v1`;
+
+export const appointmentService = `${restWestV1}/appointmentService`;
 export const availableForAppointments = "Available for appointments";
+
+export const appName = 'appointments';
+
+export const LOCATION = 'location';
+export const SERVICE_TYPE = 'serviceAppType';
+
 export const minDurationForAppointment = 30;
 export const MINIMUM_CHAR_LENGTH_FOR_PATIENT_SEARCH = 3;
 export const DEFAULT_MAX_APPOINTMENT_PROVIDERS = 1;
@@ -29,7 +38,6 @@ export const APPOINTMENT_STATUSES = {
 
 export const RECURRENCE_TERMINATION_AFTER = "After";
 export const RECURRENCE_TERMINATION_ON = "On";
-
 export const PROVIDER_RESPONSES = {
     ACCEPTED: "ACCEPTED",
     REJECTED: "REJECTED",
@@ -59,5 +67,4 @@ export const appointmentStartTimeProps = startTime => {
 export const appointmentEndTimeProps = endTime => {
     return {...appointmentTimeProps, defaultValue: 'To', defaultTime: endTime, translationKey: 'APPOINTMENT_TIME_TO_LABEL'}
 };
-
 
