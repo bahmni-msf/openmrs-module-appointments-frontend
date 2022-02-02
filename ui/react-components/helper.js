@@ -4,6 +4,7 @@ import {
     PROVIDER_RESPONSES
 } from "./constants";
 import moment from "moment";
+import {isEmpty} from "lodash";
 
 export const isSpecialitiesEnabled = appConfig => {
     if (appConfig)
@@ -63,5 +64,5 @@ export const searchFieldOnRemoveHandler=(state, setState, selectedState, setSele
 };
 
 export const isMandatory = (appConfig, nameOfTheField)  => {
-    return appConfig && !_.isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === nameOfTheField));
+    return appConfig && appConfig.mandatoryAttributes && !isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === nameOfTheField));
 };

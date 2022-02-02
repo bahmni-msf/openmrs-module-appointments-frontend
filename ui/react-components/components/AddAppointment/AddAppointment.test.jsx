@@ -196,7 +196,7 @@ describe('Add Appointment', () => {
         getByTestId('start-time-selector');
         getByTestId('end-time-selector');
         getByTestId('notes');
-        expect(getAllByTestId('error-message').length).toBe(9);
+        expect(getAllByTestId('error-message').length).toBe(11);
     });
 
     it('should display recurring plan', () => {
@@ -530,8 +530,57 @@ describe('Add Appointment', () => {
 
         const dateInputField = getByPlaceholderText('mm/dd/yyyy');
         expect(dateInputField.value).toBe(selectedDate.format('MM/DD/YYYY'));
+    });
+
+    it('should display error messages when checkAndSave is clicked and required fields given from config are not selected', () => {
+        const config = {
+            "enableSpecialities": true,
+            "enableServiceTypes": true,
+            "mandatoryAttributes": ["location", "provider", "speciality", "serviceAppType"]
+        };
+        const {getByText, getAllByText} = renderWithReactIntl(<AddAppointment appConfig={config}/>);
+        const button = getByText('Check and Save');
+        const saveAppointmentSpy = jest.spyOn(apiService, 'saveAppointment');
+        fireEvent.click(button);
+        getByText('Please select patient');
+        getByText('Please select service');
+        getByText('Please select date');
+        getByText('Please select a location');
+        getByText('Please select a provider');
+        getByText('Please select a service App Type');
+        getByText('Please select a speciality');
+        const timeError = getAllByText('Please select time');
+        expect(timeError.length).toBe(2);
+        expect(saveAppointmentSpy).not.toHaveBeenCalled();
+    });
+
+    it('should display error messages when checkAndSave is clicked and recurring type required fields given from config are not selected', () => {
+        const config = {
+               "enableSpecialities": true,
+               "enableServiceTypes": true,
+                "mandatoryAttributes": ["location", "provider", "speciality", "serviceAppType"]
+            };
+        const {getByText, queryByText, getAllByTestId, getAllByText, container} = renderWithReactIntl(<AddAppointment appConfig={config}/>);
+        const saveAppointmentSpy = jest.spyOn(apiService, 'saveRecurring');
+        const checkBox = container.querySelector('.rc-checkbox-input');
+        fireEvent.click(checkBox);
+        const checkAndSaveButton = getByText('Check and Save');
+        fireEvent.click(checkAndSaveButton);
+        expect(queryByText('Please select patient')).not.toBeNull();
+        expect(queryByText('Please select service')).not.toBeNull();
+        expect(queryByText('Please select valid recurrence period')).not.toBeNull();
+        expect(queryByText('Please select a location')).not.toBeNull();
+        expect(queryByText('Please select a service App Type')).not.toBeNull();
+        expect(queryByText('Please select a provider')).not.toBeNull();
+        expect(queryByText('Please select a speciality')).not.toBeNull();
+        expect(getAllByText('Please select time').length).toBe(2);
+        expect(getAllByText('Please select date').length).toBe(1);
+        expect(getAllByText('Please select recurrence end type').length).toBe(1);
+        expect(getAllByTestId('error-message').length).toBe(14);
+        expect(saveAppointmentSpy).not.toHaveBeenCalled();
 
     });
+
     it('should fetch patient details on load if patient is present in url params', () => {
         const {findByText} = renderWithReactIntl(<AddAppointment urlParams={{patient:"6bb24e7e-5c04-4561-9e7a-2d2bbf8074ad"}}/>);
         expect(findByText('Test Patient')).not.toBeNull();

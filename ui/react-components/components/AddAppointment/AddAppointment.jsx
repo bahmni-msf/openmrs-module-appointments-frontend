@@ -211,7 +211,7 @@ const AddAppointment = props => {
         return {...prevAppointmentDetails, ...modifiedAppointmentDetails}
     });
 
-    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? _.isEmpty(value) : false };
+    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? isEmpty(value) : false };
 
     const isValidAppointment = () => {
         const isValidPatient = appointmentDetails.patient && appointmentDetails.patient.value.uuid;
