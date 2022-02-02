@@ -21,18 +21,22 @@ import {getAppointment} from "../../api/appointmentsApi";
 import {getPatientForDropdown} from "../../mapper/patientMapper";
 import moment from "moment";
 import 'moment-timezone';
-import {getDuration, getValidProviders, isActiveProvider} from "../../helper";
+import {getDuration, getValidProviders, isActiveProvider, isMandatory} from "../../helper";
 import {
     appointmentEndTimeProps,
     appointmentStartTimeProps,
     CANCEL_CONFIRMATION_MESSAGE_EDIT,
+    LOCATION,
     MINUTES,
+    PROVIDER,
     PROVIDER_RESPONSES,
     RECURRENCE_TERMINATION_AFTER,
     RECURRENCE_TERMINATION_ON,
     RECURRING_APPOINTMENT_TYPE,
     SCHEDULED_APPOINTMENT_TYPE,
     SERVICE_ERROR_MESSAGE_TIME_OUT_INTERVAL,
+    SERVICE_TYPE,
+    SPECIALITY,
     WALK_IN_APPOINTMENT_TYPE,
     weekRecurrenceType,
     TELECONSULTATION_APPOINTMENT,
@@ -184,7 +188,7 @@ const EditAppointment = props => {
         }
         return isWalkInAppointment() ? WALK_IN_APPOINTMENT_TYPE : SCHEDULED_APPOINTMENT_TYPE;
     };
-                                                    
+
     const getAppointmentRequest = () => {
         let appointment = {
             uuid: appointmentUuid,
@@ -341,12 +345,21 @@ const EditAppointment = props => {
         }
     };
 
+    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? _.isEmpty(value) : false };
 
     const isValidAppointment = () => {
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);
         updateCommonErrorIndicators(startTimeBeforeEndTime);
-        updateErrorIndicators({appointmentDateError: !appointmentDetails.appointmentDate});
-        return appointmentDetails.service && appointmentDetails.appointmentDate && appointmentDetails.startTime && appointmentDetails.endTime && startTimeBeforeEndTime;
+        updateErrorIndicators({
+            appointmentDateError: !appointmentDetails.appointmentDate,
+            locationError: isMandatoryAndEmpty(LOCATION, appointmentDetails.location),
+            serviceTypeError: isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType),
+            providerMandatoryError: isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers),
+            specialityErrorMessage: isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality)
+        });
+        return appointmentDetails.service && appointmentDetails.appointmentDate && appointmentDetails.startTime && appointmentDetails.endTime && startTimeBeforeEndTime &&
+            !isMandatoryAndEmpty(LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType) &&
+            !isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers) && !isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality);
     };
 
     const updateCommonErrorIndicators = (startTimeBeforeEndTime) => updateErrorIndicators({
@@ -359,10 +372,13 @@ const EditAppointment = props => {
 
     const isValidRecurringAppointment = () => {
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);
-
         updateCommonErrorIndicators(startTimeBeforeEndTime);
         updateErrorIndicators({
-            recurrencePeriodError: !appointmentDetails.period || appointmentDetails.period < 1
+            recurrencePeriodError: !appointmentDetails.period || appointmentDetails.period < 1,
+            locationError: isMandatoryAndEmpty(LOCATION, appointmentDetails.location),
+            serviceTypeError: isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType),
+            providerMandatoryError: isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers),
+            specialityErrorMessage: isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality)
         });
         if (appointmentDetails.endDateType === RECURRENCE_TERMINATION_ON) {
             updateErrorIndicators({
@@ -374,7 +390,9 @@ const EditAppointment = props => {
             })
         }
         return appointmentDetails.service && appointmentDetails.startTime && appointmentDetails.endTime && startTimeBeforeEndTime
-            && appointmentDetails.appointmentDate && isValidEndDate();
+            && appointmentDetails.appointmentDate && isValidEndDate() &&
+            !isMandatoryAndEmpty(LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType) &&
+            !isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers) && !isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality);
     };
 
     const isValidEndDate = () => appointmentDetails.recurringEndDate || (appointmentDetails.occurrences && appointmentDetails.occurrences > 0);

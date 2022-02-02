@@ -7,7 +7,9 @@ export const availableForAppointments = "Available for appointments";
 export const appName = 'appointments';
 
 export const LOCATION = 'location';
-export const SERVICE_TYPE = 'serviceAppType';
+export const SERVICE_TYPE = 'serviceapptype';
+export const PROVIDER = 'provider';
+export const SPECIALITY = 'speciality';
 
 export const minDurationForAppointment = 30;
 export const MINIMUM_CHAR_LENGTH_FOR_PATIENT_SEARCH = 3;
