@@ -64,7 +64,7 @@ import {getDateTime, isStartTimeBeforeEndTime} from "../../utils/DateUtil";
 import UpdateSuccessModal from "../SuccessModal/UpdateSuccessModal.jsx";
 import UpdateConfirmationModal from "../UpdateConfirmationModal/UpdateConfirmationModal.jsx";
 import {getComponentsDisableStatus} from "./ComponentsDisableStatus";
-import {isEqual} from "lodash";
+import {isEqual,isEmpty} from "lodash";
 import ErrorMessage from "../ErrorMessage/ErrorMessage.jsx";
 import {getErrorTranslations} from "../../utils/ErrorTranslationsUtil";
 import {AppContext} from "../AppContext/AppContext";
@@ -293,7 +293,7 @@ const EditAppointment = props => {
         }
     };
 
-    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? _.isEmpty(value) : false };
+    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? isEmpty(value) : false };
 
     const isValidAppointment = () => {
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);

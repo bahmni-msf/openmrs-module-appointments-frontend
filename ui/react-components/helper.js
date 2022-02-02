@@ -4,6 +4,7 @@ import {
     PROVIDER_RESPONSES
 } from "./constants";
 import moment from "moment";
+import {isEmpty} from "lodash";
 
 export const isSpecialitiesEnabled = appConfig => {
     if (appConfig)
@@ -39,5 +40,5 @@ export const getValidProviders = providers => {
 };
 
 export const isMandatory = (appConfig, nameOfTheField)  => {
-    return appConfig && !_.isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === nameOfTheField));
+    return appConfig && appConfig.mandatoryAttributes && !isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === nameOfTheField));
 };
