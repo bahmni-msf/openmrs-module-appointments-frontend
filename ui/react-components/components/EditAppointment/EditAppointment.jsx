@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React, {Fragment, useEffect, useState} from "react";
 import {FormattedMessage, injectIntl} from "react-intl";
-import {filter, isEqual} from "lodash";
+import {filter, isEqual, isEmpty} from "lodash";
 import classNames from "classnames";
 import {
     appointmentEditor,
@@ -355,7 +355,7 @@ const EditAppointment = props => {
         }
     };
 
-    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? _.isEmpty(value) : false };
+    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? isEmpty(value) : false };
 
     const isValidAppointment = () => {
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);
