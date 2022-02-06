@@ -66,7 +66,13 @@ import {isEmpty, isNil} from 'lodash';
 import AppointmentEditorCommonFieldsWrapper
     from "../AppointmentEditorCommonFieldsWrapper/AppointmentEditorCommonFieldsWrapper.jsx";
 import Conflicts from "../Conflicts/Conflicts.jsx";
-import {isMandatory} from "../../helper";
+import {
+    isMandatory,
+    isMandatoryAndEmpty,
+    isServiceTypeEnabled,
+    isSpecialitiesEnabled,
+    isValidAppointmentDetails
+} from "../../helper";
 import updateAppointmentStatusAndProviderResponse from "../../appointment-request/AppointmentRequest";
 import * as patientApi from "../../api/patientApi";
 import {mapOpenMRSPatient} from "../../mapper/patientMapper";
@@ -213,22 +219,19 @@ const AddAppointment = props => {
         return {...prevAppointmentDetails, ...modifiedAppointmentDetails}
     });
 
-    const isMandatoryAndEmpty = (fieldName, value) =>{ return isMandatory(appConfig, fieldName) ? isEmpty(value) : false };
-
     const isValidAppointment = () => {
         const isValidPatient = appointmentDetails.patient && appointmentDetails.patient.value.uuid;
         const startTimeBeforeEndTime = isStartTimeBeforeEndTime(appointmentDetails.startTime, appointmentDetails.endTime);
         updateCommonErrorIndicators(isValidPatient, startTimeBeforeEndTime);
         updateErrorIndicators({
             appointmentDateError: !appointmentDetails.appointmentDate,
-            locationError: isMandatoryAndEmpty(LOCATION, appointmentDetails.location),
-            serviceTypeError: isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType),
-            providerMandatoryError: isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers),
-            specialityErrorMessage: isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality)
+            locationError: isMandatoryAndEmpty(appConfig,LOCATION, appointmentDetails.location),
+            serviceTypeError: isMandatoryAndEmpty(appConfig,SERVICE_TYPE, appointmentDetails.serviceType) && isServiceTypeEnabled(appConfig),
+            providerMandatoryError: isMandatoryAndEmpty(appConfig,PROVIDER, appointmentDetails.providers),
+            specialityErrorMessage: isMandatoryAndEmpty(appConfig,SPECIALITY, appointmentDetails.speciality) && isSpecialitiesEnabled(appConfig)
         });
         return isValidPatient && appointmentDetails.service && appointmentDetails.appointmentDate && appointmentDetails.startTime && appointmentDetails.endTime && startTimeBeforeEndTime &&
-            !isMandatoryAndEmpty(LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType) &&
-            !isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers) && !isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality);
+            isValidAppointmentDetails(appConfig,appointmentDetails);
     };
 
     const isValidRecurringAppointment = () => {
@@ -241,10 +244,10 @@ const AddAppointment = props => {
             endDateTypeError: !appointmentDetails.endDateType,
             weekDaysError: appointmentDetails.recurrenceType === 'WEEK' && isEmpty(selectedWeekDays),
             startDateError: !appointmentDetails.startDateType || !appointmentDetails.recurringStartDate,
-            locationError: isMandatoryAndEmpty(LOCATION, appointmentDetails.location),
-            serviceTypeError: isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType),
-            providerMandatoryError: isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers),
-            specialityErrorMessage: isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality)
+            locationError: isMandatoryAndEmpty(appConfig,LOCATION, appointmentDetails.location),
+            serviceTypeError: isMandatoryAndEmpty(appConfig,SERVICE_TYPE, appointmentDetails.serviceType) && isServiceTypeEnabled(appConfig),
+            providerMandatoryError: isMandatoryAndEmpty(appConfig,PROVIDER, appointmentDetails.providers),
+            specialityErrorMessage: isMandatoryAndEmpty(appConfig,SPECIALITY, appointmentDetails.speciality) && isSpecialitiesEnabled(appConfig)
         });
         if (appointmentDetails.endDateType) {
             updateErrorIndicators({
@@ -256,8 +259,7 @@ const AddAppointment = props => {
             && appointmentDetails.endTime && startTimeBeforeEndTime && appointmentDetails.recurrenceType
             && appointmentDetails.period && appointmentDetails.period > 0 && appointmentDetails.recurringStartDate
             && isValidEndDate() && (appointmentDetails.recurrenceType === dayRecurrenceType || !isEmpty(selectedWeekDays))
-            && !isMandatoryAndEmpty(LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(SERVICE_TYPE, appointmentDetails.serviceType)
-            && !isMandatoryAndEmpty(PROVIDER, appointmentDetails.providers) && !isMandatoryAndEmpty(SPECIALITY, appointmentDetails.speciality);
+            && isValidAppointmentDetails(appConfig,appointmentDetails)
     };
 
     const updateCommonErrorIndicators = (isValidPatient, startTimeBeforeEndTime) => updateErrorIndicators({
