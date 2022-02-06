@@ -1,7 +1,7 @@
 import {
-    DEFAULT_MAX_APPOINTMENT_PROVIDERS,
-    minDurationForAppointment,
-    PROVIDER_RESPONSES
+    DEFAULT_MAX_APPOINTMENT_PROVIDERS, LOCATION,
+    minDurationForAppointment, PROVIDER,
+    PROVIDER_RESPONSES, SERVICE_TYPE, SPECIALITY
 } from "./constants";
 import moment from "moment";
 import {isEmpty} from "lodash";
@@ -65,4 +65,23 @@ export const searchFieldOnRemoveHandler=(state, setState, selectedState, setSele
 
 export const isMandatory = (appConfig, nameOfTheField)  => {
     return appConfig && appConfig.mandatoryAttributes && !isEmpty(appConfig.mandatoryAttributes.filter(fieldName => fieldName.toLowerCase() === nameOfTheField));
+};
+
+export const isMandatoryAndEmpty = (appConfig, fieldName, value) => {
+    return isMandatory(appConfig, fieldName) ? isEmpty(value) : false;
+};
+
+export const isValidAppointmentDetails = (appConfig, appointmentDetails) => {
+    if (!isServiceTypeEnabled(appConfig) && !isSpecialitiesEnabled(appConfig)) {
+        return appConfig && appointmentDetails && !isMandatoryAndEmpty(appConfig, LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(appConfig, PROVIDER, appointmentDetails.providers);
+    } else if (isServiceTypeEnabled(appConfig) && !isSpecialitiesEnabled(appConfig)) {
+        return appConfig && appointmentDetails && !isMandatoryAndEmpty(appConfig, LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(appConfig, SERVICE_TYPE, appointmentDetails.serviceType)
+            && !isMandatoryAndEmpty(appConfig, PROVIDER, appointmentDetails.providers);
+    } else if (!isServiceTypeEnabled(appConfig) && isSpecialitiesEnabled(appConfig)) {
+        return appConfig && appointmentDetails && !isMandatoryAndEmpty(appConfig, LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(appConfig, PROVIDER, appointmentDetails.providers)
+            && !isMandatoryAndEmpty(appConfig, SPECIALITY, appointmentDetails.speciality);
+    } else {
+        return appConfig && appointmentDetails && !isMandatoryAndEmpty(appConfig, LOCATION, appointmentDetails.location) && !isMandatoryAndEmpty(appConfig, SERVICE_TYPE, appointmentDetails.serviceType)
+            && !isMandatoryAndEmpty(appConfig, PROVIDER, appointmentDetails.providers) && !isMandatoryAndEmpty(appConfig, SPECIALITY, appointmentDetails.speciality);
+    }
 };
