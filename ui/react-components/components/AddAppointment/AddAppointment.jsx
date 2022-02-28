@@ -151,7 +151,8 @@ const AddAppointment = props => {
     const reInitialiseComponent = () => {
         updateAppointmentDetails({
             ...initialAppointmentState,
-            weekDays: getWeekDays(appConfig && appConfig.startOfWeek)
+            weekDays: getWeekDays(appConfig && appConfig.startOfWeek),
+            occurrences: getDefaultOccurrences(appConfig)
         });
         updateErrorIndicators(initialErrorsState);
         setConflicts(undefined);
