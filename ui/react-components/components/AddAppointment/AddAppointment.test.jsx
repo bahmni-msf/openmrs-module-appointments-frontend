@@ -540,7 +540,7 @@ describe('Add Appointment', () => {
         };
         const {getByText, getAllByText} = renderWithReactIntl(<AddAppointment appConfig={config}/>);
         const button = getByText('Check and Save');
-        const saveAppointmentSpy = jest.spyOn(apiService, 'saveAppointment');
+        const saveAppointmentSpy = jest.spyOn(addAppointmentService, 'saveAppointment');
         fireEvent.click(button);
         getByText('Please select patient');
         getByText('Please select service');
@@ -561,7 +561,7 @@ describe('Add Appointment', () => {
                 "mandatoryAttributes": ["location", "provider", "speciality", "serviceAppType"]
             };
         const {getByText, queryByText, getAllByTestId, getAllByText, container} = renderWithReactIntl(<AddAppointment appConfig={config}/>);
-        const saveAppointmentSpy = jest.spyOn(apiService, 'saveRecurring');
+        const saveAppointmentSpy = jest.spyOn(addAppointmentService, 'saveRecurring');
         const checkBox = container.querySelector('.rc-checkbox-input');
         fireEvent.click(checkBox);
         const checkAndSaveButton = getByText('Check and Save');
