@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: npm run build
       - name: Build docker image
-        run: docker build -t bahmni-msf-lite/appointments:latest -f package/docker/Dockerfile .
+        run: docker build -t appointments:latest -f package/docker/Dockerfile .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
