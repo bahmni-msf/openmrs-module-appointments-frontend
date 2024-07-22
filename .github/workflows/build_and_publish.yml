@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - ocp-dev-bahmni-lite
-    paths-ignore:
-      - "**.md"
   workflow_dispatch:
 
 jobs:
