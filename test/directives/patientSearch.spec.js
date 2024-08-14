@@ -50,7 +50,7 @@ describe("Patient Search", function () {
         var compiledScope = element.isolateScope();
         compiledScope.patient = 'test patient';
         compiledScope.search();
-        expect(patientService.search).toHaveBeenCalledWith(compiledScope.patient);
+        expect(patientService.luceneSearch).toHaveBeenCalledWith(compiledScope.patient);
     });
 
     it('should build response map with patient name and identifier for list of patients', function () {
