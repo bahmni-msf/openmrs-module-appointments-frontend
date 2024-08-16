@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - ocp-dev-bahmni-lite
-      - MOBN-2465
   workflow_dispatch:
 
 jobs:
