@@ -1,0 +1,52 @@
+name: Build and Publish
+on:
+  push:
+    branches:
+      - CDC-appointmentModule
+  workflow_dispatch:
+
+jobs:
+  build-publish-docker:
+    name: Build & Publish Docker Image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Pull Github code
+        uses: actions/checkout@v4
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: Install dependencies ui
+        run:  cd ui && npm install
+      - name: Install dependencies root
+        run: npm install
+      - name: run test
+        run: npm run test
+      - name: Build
+        run: npm run build
+      - name: Build docker image
+        run: docker build -t appointments-cdc:latest -f package/docker/Dockerfile .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'appointments-cdc:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Set Image tag variable
+        run: echo "ARTIFACT_VERSION=$(cat package/.appversion)-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+
+      - name: Tag and Push docker image to Docker Hub
+        env:
+          REPOSITORY: ${{ secrets.DOCKER_HUB_USERNAME }}/appointments-module-cdc
+          IMAGE_TAG: ${{ env.ARTIFACT_VERSION }}
+        run: |
+          docker tag appointments-cdc:latest $REPOSITORY:latest
+          docker tag appointments-cdc:latest $REPOSITORY:$IMAGE_TAG
+          docker push $REPOSITORY:$IMAGE_TAG
+          docker push $REPOSITORY:latest
