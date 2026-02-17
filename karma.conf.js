@@ -11,7 +11,10 @@ module.exports = (config) => {
         files: [
             {pattern: 'node_modules/moment/min/moment.min.js', watched: false},
             {pattern: 'node_modules/q/q.js', watched: false},
+            {pattern: 'node_modules/whatwg-fetch/dist/fetch.umd.js', watched: false},
             {pattern: 'dist/appointment.js', watched: false},
+            {pattern: 'dist/config/*.json', watched: false, included: false},
+            {pattern: 'dist/i18n/**/*.json', watched: false, included: false},
             {pattern: 'node_modules/angular-mocks/angular-mocks.js', watched: false},
 
             {pattern: 'test/ng-test-constants.js', watched: false},
@@ -24,8 +27,8 @@ module.exports = (config) => {
         },
         coverageReporter: {
             reporters: [
-                {type: 'json', dir: 'coverage/'},
-                {type: 'html', dir: 'coverage/'},
+                {type: 'json', dir: 'coverage/json', subdir: '.', file: 'coverage-final.json'},
+                {type: 'html', dir: 'coverage/html', subdir: '.'},
                 {type: 'text-summary'}
             ]
         },
@@ -37,8 +40,16 @@ module.exports = (config) => {
         webpackMiddleware: {
             stats: 'errors-only',
         },
+        proxies: {
+            '/config/': '/base/dist/config/',
+            '/i18n/': '/base/dist/i18n/',
+            '/bahmni_config/openmrs/i18n/': '/base/dist/i18n/'
+        },
         client: {
-            captureConsole: false
+            captureConsole: false,
+            jasmine: {
+                random: false
+            }
         }
     });
 };
